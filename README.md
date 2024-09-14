@@ -1,0 +1,1 @@
+# qt-weatherforcase-newbie
