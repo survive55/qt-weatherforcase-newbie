@@ -4,31 +4,36 @@
 #include <QWidget>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QJsonArray>
+#include <QLabel>
 
 class WeatherWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    WeatherWidget(QWidget *parent = nullptr);
+    explicit WeatherWidget(QWidget *parent = nullptr);
 
 private slots:
     void fetchWeather();
-  void onWeatherDataReceived(QNetworkReply *reply);
+    void onWeatherDataReceived(QNetworkReply *reply);
+    void updateCountdown();
 
 private:
+    void updateUI(const QString &temperature, const QString &description, const QString &humidity);
+
     QNetworkAccessManager *manager;
     QLineEdit *cityInput;
+    QLineEdit *ApiInput;
     QPushButton *searchButton;
     QLabel *temperatureLabel;
     QLabel *descriptionLabel;
     QLabel *humidityLabel;
-
-    void updateUI(const QString &temperature, const QString &description, const QString &humidity);
+    QTimer *timer;
+    QLabel *countdownLabel;
+    int countdown=600;
+    QTimer *countdownTimer;
 };
 
 #endif // WEATHERWIDGET_H
