@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include "ui_mainwindow.h"
 
 class WeatherWidget : public QWidget
 {
@@ -15,10 +16,27 @@ class WeatherWidget : public QWidget
 public:
     explicit WeatherWidget(QWidget *parent = nullptr);
 
+   void updateUI(Ui::MainWindow *ui);
+    int getCountdown() const;
+
+   public:
+           void fetchWeather(const QString &city, const QString &apiKey);
+
+signals:
+    void weatherDataUpdated();
+    void countdownUpdated(int countdown);
+public:
+
+    void setCity(const QString &city);
+    void setApiKey(const QString &apiKey);
+    QJsonObject getCurrentWeather();
+
 private slots:
-    void fetchWeather();
+
+
     void onWeatherDataReceived(QNetworkReply *reply);
     void updateCountdown();
+
 
 private:
     void updateUI(const QString &temperature, const QString &description, const QString &humidity);
@@ -34,6 +52,10 @@ private:
     QLabel *countdownLabel;
     int countdown=600;
     QTimer *countdownTimer;
+    QString city;
+    QString apiKey;
+    QString temperature;
+    QString description;
 };
 
 #endif // WEATHERWIDGET_H

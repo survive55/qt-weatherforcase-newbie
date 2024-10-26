@@ -8,3 +8,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     weatherforcase.cpp
+
+FORMS += \
+    ../../Downloads/mainwindow.ui

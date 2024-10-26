@@ -1,85 +1,88 @@
 #include "mainwindow.h"
-#include <QTreeWidget>
-#include <QTabWidget>
-#include <QTextEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSplitter>
+#include "ui_mainwindow.h"
+#include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
-    setupUi();
-}
-
-void MainWindow::setupUi()
-{
-    setWindowTitle("WeatherForecast");
-    setGeometry(100, 100, 1000, 600);
-
-    QWidget *centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
-    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
-
-    QSplitter *splitter = new QSplitter(Qt::Horizontal, centralWidget);
-    mainLayout->addWidget(splitter);
+    ui->setupUi(this);
+    manager = new QNetworkAccessManager(this);
 
 
-    tree = new QTreeWidget();
-    tree->setHeaderLabel("天氣預報");
-    QStringList items = {"台灣", "中國", "日本", "韓國"};
-    for (const QString &item : items) {
-        QTreeWidgetItem *treeItem = new QTreeWidgetItem(QStringList(item));
-        tree->addTopLevelItem(treeItem);
+    QStringList countryCodes;
+    countryCodes << "US" << "CA" << "UK" << "JP"<<"TW";
+    ui->cmbBox->addItems(countryCodes);
+
+    weatherWidget = new WeatherWidget(this); // Initialize the WeatherWidget
+    connect(weatherWidget, &WeatherWidget::countdownUpdated, this, &MainWindow::updateCountdownLabel);
+
+
     }
-    splitter->addWidget(tree);
-
-    // Right side
-    QWidget *rightWidget = new QWidget();
-    QVBoxLayout *rightLayout = new QVBoxLayout(rightWidget);
-    splitter->addWidget(rightWidget);
-
-    // Top buttons
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
-    QPushButton *weatherButton = new QPushButton("天氣預報", rightWidget);
-    buttonLayout->addWidget(weatherButton);
-    connect(weatherButton, &QPushButton::clicked, this, &MainWindow::openWeatherWidget);
-    rightLayout->addLayout(buttonLayout);
 
 
-    tabs = new QTabWidget(rightWidget);
-    rightLayout->addWidget(tabs);
-
-
-    weatherWidget = new WeatherWidget(this);
-    tabs->addTab(weatherWidget, "天氣預報");
-
-    // Add an "Overview" tab
-    QWidget *overviewTab = new QWidget();
-    QVBoxLayout *overviewLayout = new QVBoxLayout(overviewTab);
-    QLabel *overviewLabel = new QLabel("歡迎使用天氣預報應用！\n\n"
-                                       "使用方法：\n"
-                                       "1. 點擊左側樹狀圖中的地區\n"
-                                       "2. 在右側的「天氣預報」標籤頁中輸入城市名稱\n"
-                                       "3. 輸入您的 API 密鑰\n"
-                                       "4. 點擊「搜索」按鈕獲取天氣信息");
-    overviewLayout->addWidget(overviewLabel);
-    tabs->addTab(overviewTab, "總覽");
-
-    // Set the "Overview" tab as the default
-    tabs->setCurrentIndex(1);
-
-    // Log area
-    logArea = new QTextEdit(rightWidget);
-    logArea->setReadOnly(true);
-    logArea->setMaximumHeight(100);
-    rightLayout->addWidget(logArea);
-
-    // Set the splitter's initial sizes
-    splitter->setSizes(QList<int>() << 200 << 800);
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
-void MainWindow::openWeatherWidget()
+
+void MainWindow::on_btnGo_clicked()
 {
-    tabs->setCurrentWidget(weatherWidget);
+    QString countryCode = ui->cmbBox->currentText();
+    QString zipCode = ui->txtZipCode->text();
+     QString apiKey = "baa4a5e48bb2204d59ba0a956420b988";
+      weatherWidget->fetchWeather("", apiKey);
+
+    QString url = QString("http://api.openweathermap.org/data/2.5/weather?zip=%1,%2&appid=%3&units=metric")
+                      .arg(zipCode)
+                      .arg(countryCode)
+                      .arg(API_KEY);
+
+    QNetworkRequest request(url);
+    QNetworkReply *reply = manager->get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        onWeatherDataReceived(reply);
+    });
+}
+
+
+void MainWindow::onWeatherDataReceived(QNetworkReply *reply)
+{
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        QJsonDocument document = QJsonDocument::fromJson(data);
+
+
+        weatherWidget->updateUI(ui);
+
+        QJsonObject json = document.object();
+          temperature = QString::number(json["main"].toObject()["temp"].toDouble());
+
+
+          ui->lbltemprature->setText(QString::number(json["main"].toObject()["temp"].toDouble()));
+          ui->lblDescription->setText(json["weather"].toArray()[0].toObject()["description"].toString());
+          ui->lblWind->setText(QString::number(json["wind"].toObject()["speed"].toDouble()) + " m/s");
+          ui->lblHumidity->setText(QString::number(json["main"].toObject()["humidity"].toInt()) + "%");
+          ui->lblRealFeel->setText(QString::number(json["main"].toObject()["feels_like"].toDouble()) + "°C");
+          ui->lblCity->setText(json["name"].toString());
+          ui->lblCountryName->setText(json["sys"].toObject()["country"].toString());
+
+
+
+    }
+
+    reply->deleteLater();
+}
+
+void MainWindow::on_btnMoreDetails_clicked()
+{
+
+    weatherWidget->show();
+}
+
+void MainWindow::updateCountdownLabel(int countdown)
+{
+    ui->countdownLabel->setText("刷新倒計時: " + QString::number(weatherWidget->getCountdown()));
 }

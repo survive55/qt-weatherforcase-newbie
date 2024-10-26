@@ -38,8 +38,10 @@ namespace {
 struct qt_meta_stringdata_CLASSWeatherWidgetENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSWeatherWidgetENDCLASS = QtMocHelpers::stringData(
     "WeatherWidget",
-    "fetchWeather",
+    "weatherDataUpdated",
     "",
+    "countdownUpdated",
+    "countdown",
     "onWeatherDataReceived",
     "QNetworkReply*",
     "reply",
@@ -56,21 +58,27 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSWeatherWidgetENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       2,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    0,   38,    2, 0x06,    1 /* Public */,
+       3,    1,   39,    2, 0x06,    2 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   32,    2, 0x08,    1 /* Private */,
-       3,    1,   33,    2, 0x08,    2 /* Private */,
-       6,    0,   36,    2, 0x08,    4 /* Private */,
+       5,    1,   42,    2, 0x08,    4 /* Private */,
+       8,    0,   45,    2, 0x08,    6 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    4,
 
  // slots: parameters
-    QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 4,    5,
+    QMetaType::Void, 0x80000000 | 6,    7,
     QMetaType::Void,
 
        0        // eod
@@ -85,8 +93,11 @@ Q_CONSTINIT const QMetaObject WeatherWidget::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSWeatherWidgetENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<WeatherWidget, std::true_type>,
-        // method 'fetchWeather'
+        // method 'weatherDataUpdated'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'countdownUpdated'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
         // method 'onWeatherDataReceived'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QNetworkReply *, std::false_type>,
@@ -102,21 +113,38 @@ void WeatherWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         auto *_t = static_cast<WeatherWidget *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->fetchWeather(); break;
-        case 1: _t->onWeatherDataReceived((*reinterpret_cast< std::add_pointer_t<QNetworkReply*>>(_a[1]))); break;
-        case 2: _t->updateCountdown(); break;
+        case 0: _t->weatherDataUpdated(); break;
+        case 1: _t->countdownUpdated((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 2: _t->onWeatherDataReceived((*reinterpret_cast< std::add_pointer_t<QNetworkReply*>>(_a[1]))); break;
+        case 3: _t->updateCountdown(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
-        case 1:
+        case 2:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
             case 0:
                 *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< QNetworkReply* >(); break;
             }
             break;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (WeatherWidget::*)();
+            if (_t _q_method = &WeatherWidget::weatherDataUpdated; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (WeatherWidget::*)(int );
+            if (_t _q_method = &WeatherWidget::countdownUpdated; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 1;
+                return;
+            }
         }
     }
 }
@@ -140,14 +168,27 @@ int WeatherWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
+}
+
+// SIGNAL 0
+void WeatherWidget::weatherDataUpdated()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+
+// SIGNAL 1
+void WeatherWidget::countdownUpdated(int _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP
