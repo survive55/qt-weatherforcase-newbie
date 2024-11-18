@@ -1,16 +1,11 @@
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QGeoPositionInfoSource>
+#include <QGeoCoordinate>
 #include <QMainWindow>
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QDebug>
-#include <QStringList>
-#include "weatherwidget.h"  // Include the header for your WeatherWidget
-
+#include "weatherwidget.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -25,18 +20,21 @@ public:
 
 private slots:
     void on_btnGo_clicked();
-    void onWeatherDataReceived(QNetworkReply *reply);
-    void on_btnMoreDetails_clicked();
-
-        void updateCountdownLabel(int countdown);
+    void updateCountdownLabel(int countdown);
+    void on_btnLocate_clicked();
+    void positionUpdated(const QGeoPositionInfo &info);
+    void on_actionApiKeySettings_clicked();
 
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager *manager;
-    QString API_KEY = "baa4a5e48bb2204d59ba0a956420b988";
     WeatherWidget *weatherWidget;
-    QString temperature;
-    QString description;
+    QString cityName;
+    QGeoPositionInfoSource *positionSource;
+    QNetworkAccessManager *networkManager;
+
+
+
 };
 
 #endif // MAINWINDOW_H
