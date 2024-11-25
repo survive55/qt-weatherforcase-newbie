@@ -36,8 +36,11 @@ private:
     QNetworkAccessManager *networkManager;
     void getPublicIpAddress();
     void getCityByIp(const QString &ipAddress);
+    void loadCityList();
+    void saveCityList();
 
-
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 };
 

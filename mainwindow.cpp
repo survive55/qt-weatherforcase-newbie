@@ -10,7 +10,7 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
-
+#include <QContextMenuEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -26,10 +26,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(weatherWidget, &WeatherWidget::weatherDataUpdated, [this]() {
         weatherWidget->updateUI(ui);
     });
-connect(weatherWidget, &WeatherWidget::forecastDataUpdated, this, &MainWindow::updateForecastTable);}
+    connect(weatherWidget, &WeatherWidget::forecastDataUpdated, this, &MainWindow::updateForecastTable);
+    loadCityList();
+    ui->cmbCityName->setEditable(true);
+    ui->cmbCityName->installEventFilter(this);
+
+    QStringList cityList;
+
+    ui->cmbCityName->addItems(cityList);
+    ui->cmbCityName->setEditable(true);
+}
 
 MainWindow::~MainWindow()
 {
+    saveCityList();
     delete ui;
 }
 
@@ -43,11 +53,16 @@ void MainWindow::on_btnGo_clicked()
         return;
     }
 
-    cityName = ui->txtCityName->text();
+    cityName = ui->cmbCityName->currentText();
 
     if (cityName.isEmpty()) {
-        QMessageBox::warning(this, "input error", "Please enter a city name");
+        QMessageBox::warning(this, "Input error", "Please enter a city name");
         return;
+    }
+
+    // 如果城市名称不在下拉列表中，添加到列表中
+    if (ui->cmbCityName->findText(cityName) == -1) {
+        ui->cmbCityName->addItem(cityName);
     }
 
     weatherWidget->fetchWeather(cityName, apiKey);
@@ -55,7 +70,6 @@ void MainWindow::on_btnGo_clicked()
 
     updateCountdownLabel(weatherWidget->getCountdown());
 }
-
 void MainWindow::updateCountdownLabel(int countdown)
 {
     ui->countdownLabel->setText("Countdown to Refresh " + QString::number(countdown) + " 秒");
@@ -105,7 +119,7 @@ void MainWindow::getCityByIp(const QString &ipAddress)
             QString city = jsonObj["city"].toString();
 
             if (!city.isEmpty()) {
-                ui->txtCityName->setText(city);
+                ui->cmbCityName->setCurrentText(city);
                 on_btnGo_clicked();
             } else {
                 QMessageBox::warning(this, "error", "Unable to get city information");
@@ -161,6 +175,44 @@ void MainWindow::updateForecastTable()
             iconReply->deleteLater();
         });
     }
+}
+void MainWindow::loadCityList()
+{
+    QSettings settings("YourCompany", "YourApp");
+    QStringList cityList = settings.value("cityList").toStringList();
+    if (cityList.isEmpty()) {
+        cityList << "Taipei" << "New York" << "London" << "Tokyo" << "Sydney";
+    }
+    ui->cmbCityName->clear();
+    ui->cmbCityName->addItems(cityList);
+}
+
+void MainWindow::saveCityList()
+{
+    QSettings settings("YourCompany", "YourApp");
+    QStringList cityList;
+    for (int i = 0; i < ui->cmbCityName->count(); ++i) {
+        cityList << ui->cmbCityName->itemText(i);
+    }
+    settings.setValue("cityList", cityList);
+}
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->cmbCityName && event->type() == QEvent::ContextMenu) {
+        QContextMenuEvent *menuEvent = static_cast<QContextMenuEvent*>(event);
+        QMenu menu;
+        QAction *removeAction = new QAction("Remove City", &menu);
+        connect(removeAction, &QAction::triggered, [this]() {
+            int index = ui->cmbCityName->currentIndex();
+            if (index != -1) {
+                ui->cmbCityName->removeItem(index);
+            }
+        });
+        menu.addAction(removeAction);
+        menu.exec(menuEvent->globalPos());
+        return true;
+    }
+    return QMainWindow::eventFilter(obj, event);
 }
 void MainWindow::on_actionApiKeySettings_clicked()
 {

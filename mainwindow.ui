@@ -195,7 +195,7 @@
          <item>
           <widget class="QLabel" name="lblFeelsLike">
            <property name="text">
-            <string>RealFeel</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -333,12 +333,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtCityName">
-       <property name="enabled">
+      <widget class="QComboBox" name="cmbCityName">
+       <property name="editable">
         <bool>true</bool>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
