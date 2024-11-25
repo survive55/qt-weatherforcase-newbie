@@ -8,6 +8,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,19 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(weatherWidget, &WeatherWidget::weatherDataUpdated, [this]() {
         weatherWidget->updateUI(ui);
     });
-
-    positionSource = QGeoPositionInfoSource::createDefaultSource(this);
-    if (positionSource) {
-        connect(positionSource, &QGeoPositionInfoSource::positionUpdated,
-                this, &MainWindow::positionUpdated);
-        connect(positionSource, &QGeoPositionInfoSource::errorOccurred,
-                this, [this](QGeoPositionInfoSource::Error error) {
-                    QMessageBox::warning(this, "位置更新错误", "无法获取位置信息。");
-                });
-    } else {
-        QMessageBox::warning(this, "错误", "无法创建位置源，请检查您的设备是否支持定位功能。");
-    }
-}
+connect(weatherWidget, &WeatherWidget::forecastDataUpdated, this, &MainWindow::updateForecastTable);}
 
 MainWindow::~MainWindow()
 {
@@ -47,86 +39,132 @@ void MainWindow::on_btnGo_clicked()
     QString apiKey = settings.value("apiKey", "").toString();
 
     if (apiKey.isEmpty()) {
-        QMessageBox::warning(this, "API 密钥未设置", "请在设置中输入您的 API 密钥。");
+        QMessageBox::warning(this, "API key not set", "Please enter your API key in the settings.");
         return;
     }
 
     cityName = ui->txtCityName->text();
 
     if (cityName.isEmpty()) {
-        QMessageBox::warning(this, "输入错误", "请输入城市名称。");
+        QMessageBox::warning(this, "input error", "Please enter a city name");
         return;
     }
 
     weatherWidget->fetchWeather(cityName, apiKey);
+    weatherWidget->fetchForecast(cityName, apiKey);
 
     updateCountdownLabel(weatherWidget->getCountdown());
 }
 
 void MainWindow::updateCountdownLabel(int countdown)
 {
-    ui->countdownLabel->setText("刷新倒计时: " + QString::number(countdown) + " 秒");
+    ui->countdownLabel->setText("Countdown to Refresh " + QString::number(countdown) + " 秒");
 }
 
 void MainWindow::on_btnLocate_clicked()
 {
-    if (positionSource) {
-        positionSource->startUpdates();
-    } else {
-        QMessageBox::warning(this, "错误", "位置源不可用。");
-    }
+    getPublicIpAddress();
 }
 
-void MainWindow::positionUpdated(const QGeoPositionInfo &info)
+void MainWindow::getPublicIpAddress()
 {
-    positionSource->stopUpdates();
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://api.ipify.org?format=json"));
+    QNetworkReply *reply = networkManager->get(request);
 
-    QGeoCoordinate coordinate = info.coordinate();
-    if (coordinate.isValid()) {
-        QString url = QString("https://nominatim.openstreetmap.org/reverse?format=json&lat=%1&lon=%2&zoom=18&addressdetails=1")
-        .arg(coordinate.latitude(), 0, 'f', 8)
-            .arg(coordinate.longitude(), 0, 'f', 8);
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray responseData = reply->readAll();
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+            QJsonObject jsonObj = jsonDoc.object();
+            QString publicIp = jsonObj["ip"].toString();
 
-        QNetworkRequest request((QUrl(url)));
-
-        request.setRawHeader("User-Agent", "weatherforcast/1.0 (timeset8000@gmail.com)");
-
-        QNetworkReply *reply = networkManager->get(request);
-
-        connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-            if (reply->error() == QNetworkReply::NoError) {
-                QByteArray responseData = reply->readAll();
-                QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-                QJsonObject jsonObj = jsonDoc.object();
-
-                QJsonObject addressObj = jsonObj["address"].toObject();
-                cityName = addressObj["city"].toString();
-
-                if (cityName.isEmpty()) {
-                    cityName = addressObj["town"].toString();
-                }
-                if (cityName.isEmpty()) {
-                    cityName = addressObj["village"].toString();
-                }
-
-                if (cityName.isEmpty()) {
-                    QMessageBox::warning(this, "错误", "无法获取城市名称。");
-                } else {
-                    ui->txtCityName->setText(cityName);
-                    on_btnGo_clicked(); // 自动查询天气
-                }
+            if (!publicIp.isEmpty()) {
+                getCityByIp(publicIp);
             } else {
-                QMessageBox::warning(this, "错误", "逆地理编码失败：" + reply->errorString());
+                QMessageBox::warning(this, "error", "Unable to obtain a public IP address");
             }
-            reply->deleteLater();
-        });
-    } else {
-        QMessageBox::warning(this, "错误", "获取的坐标无效。");
-    }
+        } else {
+            QMessageBox::warning(this, "error", "Failed to obtain a public IP address:" + reply->errorString());
+        }
+        reply->deleteLater();
+    });
 }
 
+void MainWindow::getCityByIp(const QString &ipAddress)
+{
+    QNetworkRequest request;
+    request.setUrl(QUrl(QString("http://ip-api.com/json/%1?fields=city").arg(ipAddress)));
+    QNetworkReply *reply = networkManager->get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray responseData = reply->readAll();
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+            QJsonObject jsonObj = jsonDoc.object();
+            QString city = jsonObj["city"].toString();
+
+            if (!city.isEmpty()) {
+                ui->txtCityName->setText(city);
+                on_btnGo_clicked();
+            } else {
+                QMessageBox::warning(this, "error", "Unable to get city information");
+            }
+        } else {
+            QMessageBox::warning(this, "error", "IP geolocation failure：" + reply->errorString());
+        }
+        reply->deleteLater();
+    });
+}
+void MainWindow::updateForecastTable()
+{
+    ui->forecastTableWidget->clearContents();
+    ui->forecastTableWidget->setRowCount(weatherWidget->forecastData.size());
+    ui->forecastTableWidget->setColumnCount(4);
+
+    QStringList headers;
+    headers << "Date Time" << "temperature" << "description" << "icon";
+    ui->forecastTableWidget->setHorizontalHeaderLabels(headers);
+
+    for (int i = 0; i < weatherWidget->forecastData.size(); ++i)
+    {
+        QVariantMap data = weatherWidget->forecastData[i];
+
+        QTableWidgetItem *datetimeItem = new QTableWidgetItem(data["datetime"].toString());
+        QTableWidgetItem *tempItem = new QTableWidgetItem(data["temperature"].toString());
+        QTableWidgetItem *descItem = new QTableWidgetItem(data["description"].toString());
+
+        ui->forecastTableWidget->setItem(i, 0, datetimeItem);
+        ui->forecastTableWidget->setItem(i, 1, tempItem);
+        ui->forecastTableWidget->setItem(i, 2, descItem);
+
+          // Load and display icons
+        QString iconCode = data["icon"].toString();
+        QString iconUrl = QString("http://openweathermap.org/img/wn/%1.png").arg(iconCode);
+        QNetworkRequest iconRequest(iconUrl);
+        QNetworkReply *iconReply = networkManager->get(iconRequest);
+
+        connect(iconReply, &QNetworkReply::finished, [this, iconReply, i]() {
+            if (iconReply->error() == QNetworkReply::NoError)
+            {
+                QByteArray iconData = iconReply->readAll();
+                QPixmap pixmap;
+                pixmap.loadFromData(iconData);
+                QTableWidgetItem *iconItem = new QTableWidgetItem;
+                iconItem->setData(Qt::DecorationRole, pixmap.scaled(50, 50, Qt::KeepAspectRatio));
+                ui->forecastTableWidget->setItem(i, 3, iconItem);
+            }
+            else
+            {
+                qDebug() << "Unable to load weather icon:" << iconReply->errorString();
+            }
+            iconReply->deleteLater();
+        });
+    }
+}
 void MainWindow::on_actionApiKeySettings_clicked()
 {
     SettingsDialog settingsDialog(this);
     settingsDialog.exec();
 }
+

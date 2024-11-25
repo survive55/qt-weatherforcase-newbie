@@ -34,11 +34,11 @@ void SettingsDialog::on_saveButton_clicked()
     QString apiKey = ui->txtApiKey->text().trimmed();
 
     if (apiKey.isEmpty()) {
-        QMessageBox::warning(this, "输入错误", "API 密钥不能为空！");
+        QMessageBox::warning(this, "input error", "The API key cannot be empty!");
         return;
     }
 
     saveApiKey(apiKey);
-    QMessageBox::information(this, "保存成功", "API 密钥已保存。");
-    accept(); // 关闭对话框
+    QMessageBox::information(this, "Save Successful", "The API key is saved.");
+    accept(); // Close dialog box
 }

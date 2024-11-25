@@ -16,16 +16,30 @@ public:
     void fetchWeather(const QString &cityName, const QString &apiKey);
     void updateUI(Ui::MainWindow *ui);
     int getCountdown() const;
+    void fetchForecast(const QString &cityName, const QString &apiKey);
+    QList<QVariantMap> forecastData;
+
+
 
 signals:
     void weatherDataUpdated();
     void countdownUpdated(int countdown);
+    void forecastDataUpdated();
+
+
+
+
 
 private slots:
     void onWeatherDataReceived(QNetworkReply *reply);
     void updateCountdown();
 
+
+
 private:
+
+
+
     QNetworkAccessManager *manager;
     QTimer *timer;
     QTimer *countdownTimer;
@@ -38,7 +52,12 @@ private:
     QString windSpeed;
     QString countryCode;
     QString feelsLikeTemperature;
+ QString iconCode;
+
+
 
 };
+
+
 
 #endif // WEATHERWIDGET_H

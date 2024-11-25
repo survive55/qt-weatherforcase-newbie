@@ -22,8 +22,10 @@ private slots:
     void on_btnGo_clicked();
     void updateCountdownLabel(int countdown);
     void on_btnLocate_clicked();
-    void positionUpdated(const QGeoPositionInfo &info);
+    void updateForecastTable();
+
     void on_actionApiKeySettings_clicked();
+
 
 private:
     Ui::MainWindow *ui;
@@ -32,6 +34,8 @@ private:
     QString cityName;
     QGeoPositionInfoSource *positionSource;
     QNetworkAccessManager *networkManager;
+    void getPublicIpAddress();
+    void getCityByIp(const QString &ipAddress);
 
 
 

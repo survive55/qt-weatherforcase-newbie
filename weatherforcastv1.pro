@@ -7,6 +7,8 @@ QT += network
 QT += core gui network
 QT += positioning
 QT += location
+QT += core gui widgets network
+
 
 QT += core gui network positioning location
 SOURCES += \
