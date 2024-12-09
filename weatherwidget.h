@@ -4,10 +4,9 @@
 #include <QWidget>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
 #include "ui_mainwindow.h"
+#include <QTimer>
+#include <QVariantMap>
 
 class WeatherWidget : public QWidget
 {
@@ -16,46 +15,39 @@ class WeatherWidget : public QWidget
 public:
     explicit WeatherWidget(QWidget *parent = nullptr);
 
-   void updateUI(Ui::MainWindow *ui);
+    void fetchWeather(const QString &cityName, const QString &apiKey);
+    void updateUI(Ui::MainWindow *ui);
     int getCountdown() const;
+    void fetchForecast(const QString &cityName, const QString &apiKey);
+    void fetchAlertsFromWeatherAPI(const QString &cityName, const QString &weatherApiKey);
+    QList<QVariantMap> dailyForecastData; // 存储每日天气数据
 
-   public:
-           void fetchWeather(const QString &city, const QString &apiKey);
+    // 添加成员变量
+    QList<QVariantMap> alertsData; // 存储预警数据
 
 signals:
     void weatherDataUpdated();
     void countdownUpdated(int countdown);
-public:
-
-    void setCity(const QString &city);
-    void setApiKey(const QString &apiKey);
-    QJsonObject getCurrentWeather();
-
+    void forecastDataUpdated(); // 发出天气预报数据已更新的信号
+    void alertsDataUpdated();
 private slots:
-
-
     void onWeatherDataReceived(QNetworkReply *reply);
     void updateCountdown();
 
-
 private:
-    void updateUI(const QString &temperature, const QString &description, const QString &humidity);
-
     QNetworkAccessManager *manager;
-    QLineEdit *cityInput;
-    QLineEdit *ApiInput;
-    QPushButton *searchButton;
-    QLabel *temperatureLabel;
-    QLabel *descriptionLabel;
-    QLabel *humidityLabel;
     QTimer *timer;
-    QLabel *countdownLabel;
-    int countdown=600;
     QTimer *countdownTimer;
-    QString city;
+    int countdown = 600;
+    QString cityName;
     QString apiKey;
     QString temperature;
     QString description;
+    QString humidity;
+    QString windSpeed;
+    QString countryCode;
+    QString feelsLikeTemperature;
+    QString iconCode;
 };
 
 #endif // WEATHERWIDGET_H
