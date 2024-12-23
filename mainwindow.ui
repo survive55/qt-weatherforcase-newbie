@@ -6,17 +6,11 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>974</width>
     <height>550</height>
    </rect>
   </property>
   <property name="minimumSize">
-   <size>
-    <width>650</width>
-    <height>550</height>
-   </size>
-  </property>
-  <property name="maximumSize">
    <size>
     <width>650</width>
     <height>550</height>
@@ -29,69 +23,13 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>11</y>
-      <width>619</width>
-      <height>579</height>
+      <x>10</x>
+      <y>32</y>
+      <width>631</width>
+      <height>531</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Country Code </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="cmbBox">
-         <property name="minimumSize">
-          <size>
-           <width>250</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Zip Code</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="txtZipCode">
-         <property name="minimumSize">
-          <size>
-           <width>70</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <kerning>true</kerning>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnGo">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Go</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item>
       <spacer name="verticalSpacer_2">
        <property name="orientation">
@@ -109,25 +47,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnMoreDetails">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>100</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>More Details..</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
@@ -136,29 +55,22 @@
         </size>
        </property>
        <property name="title">
-        <string>CURRENT WEATHER</string>
+        <string/>
        </property>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>370</x>
           <y>70</y>
-          <width>131</width>
+          <width>134</width>
           <height>18</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="lblCityCountry">
            <property name="text">
-            <string>City</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblCity">
-           <property name="text">
-            <string>City Name</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -168,23 +80,16 @@
         <property name="geometry">
          <rect>
           <x>370</x>
-          <y>100</y>
+          <y>120</y>
           <width>134</width>
-          <height>18</height>
+          <height>31</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label_8">
+          <widget class="QPushButton" name="actionApiKeySettings">
            <property name="text">
-            <string>Country</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblCountryName">
-           <property name="text">
-            <string>Country Name</string>
+            <string>API KEY SETTING</string>
            </property>
           </widget>
          </item>
@@ -234,7 +139,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lblWind">
+          <widget class="QLabel" name="lblWindSpeed">
            <property name="text">
             <string/>
            </property>
@@ -272,6 +177,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="lblWeatherIcon">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="layoutWidget">
@@ -292,9 +204,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lblRealFeel">
+          <widget class="QLabel" name="lblFeelsLike">
            <property name="text">
-            <string>RealFeel</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -311,7 +223,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QLabel" name="lbltemprature">
+          <widget class="QLabel" name="lblTemperature">
            <property name="minimumSize">
             <size>
              <width>50</width>
@@ -334,29 +246,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>o</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblCelcius">
-             <property name="font">
-              <font>
-               <pointsize>20</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>C</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
        <widget class="QLabel" name="countdownLabel">
@@ -365,32 +254,124 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>470</x>
+          <x>320</x>
           <y>180</y>
-          <width>91</width>
-          <height>16</height>
+          <width>231</width>
+          <height>51</height>
          </rect>
         </property>
         <property name="text">
          <string>countdown:</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="btnClose">
+        <property name="geometry">
+         <rect>
+          <x>540</x>
+          <y>10</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string> ✕</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btnMinimize">
+        <property name="geometry">
+         <rect>
+          <x>540</x>
+          <y>42</y>
+          <width>75</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>—</string>
+        </property>
+       </widget>
+       <widget class="QListWidget" name="forecastListWidget">
+        <property name="geometry">
+         <rect>
+          <x>-5</x>
+          <y>270</y>
+          <width>631</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>470</x>
+          <y>70</y>
+          <width>63</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Country</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>617</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="City">
+       <property name="text">
+        <string>CITYINPUT</string>
+       </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
+      <widget class="QComboBox" name="cmbCityName">
+       <property name="editable">
+        <bool>true</bool>
        </property>
-       <property name="sizeHint" stdset="0">
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLocate">
+       <property name="text">
+        <string>Locate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnGo">
+       <property name="minimumSize">
         <size>
-         <width>20</width>
-         <height>40</height>
+         <width>0</width>
+         <height>30</height>
         </size>
        </property>
-      </spacer>
+       <property name="text">
+        <string>Go</string>
+       </property>
+      </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QListWidget" name="alertsListWidget">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>30</y>
+      <width>311</width>
+      <height>481</height>
+     </rect>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -398,7 +379,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>650</width>
+     <width>974</width>
      <height>21</height>
     </rect>
    </property>
