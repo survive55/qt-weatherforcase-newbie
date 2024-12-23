@@ -4,10 +4,9 @@
 #include <QWidget>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
 #include "ui_mainwindow.h"
+#include <QTimer>
+#include <QVariantMap>
 
 class WeatherWidget : public QWidget
 {
@@ -15,47 +14,51 @@ class WeatherWidget : public QWidget
 
 public:
     explicit WeatherWidget(QWidget *parent = nullptr);
-
-   void updateUI(Ui::MainWindow *ui);
+    void fetchWeather(const QString &cityName, const QString &apiKey);
+    void updateUI(Ui::MainWindow *ui);
     int getCountdown() const;
+    void fetchForecast(const QString &cityName, const QString &apiKey);
+    void fetchAlertsFromWeatherAPI(const QString &cityName, const QString &weatherApiKey);
+    QList<QVariantMap> dailyForecastData;
 
-   public:
-           void fetchWeather(const QString &city, const QString &apiKey);
+    QList<QVariantMap> alertsData;
 
 signals:
     void weatherDataUpdated();
     void countdownUpdated(int countdown);
-public:
-
-    void setCity(const QString &city);
-    void setApiKey(const QString &apiKey);
-    QJsonObject getCurrentWeather();
+    void forecastDataUpdated();
+    void alertsDataUpdated();
+    void weatherAlert(const QString &message, const QString &severity);
 
 private slots:
-
-
     void onWeatherDataReceived(QNetworkReply *reply);
     void updateCountdown();
 
 
 private:
-    void updateUI(const QString &temperature, const QString &description, const QString &humidity);
-
     QNetworkAccessManager *manager;
-    QLineEdit *cityInput;
-    QLineEdit *ApiInput;
-    QPushButton *searchButton;
-    QLabel *temperatureLabel;
-    QLabel *descriptionLabel;
-    QLabel *humidityLabel;
     QTimer *timer;
-    QLabel *countdownLabel;
-    int countdown=600;
     QTimer *countdownTimer;
-    QString city;
+    int countdown = 600;
+    QString cityName;
     QString apiKey;
     QString temperature;
     QString description;
+    QString humidity;
+    QString windSpeed;
+    QString countryCode;
+    QString feelsLikeTemperature;
+    QString iconCode;
+    QString cwbApiKey;
+    QTimer *cwbTimer;
+    void initializeTaiwanCityMap();
+    void fetchCWBAlerts(const QString &cityName);
+    void processCWBAlerts(const QByteArray &data);
+     QString currentCity;
+    QMap<QString, QString> taiwanCityMap;
+    bool isInTaiwan = false;
+
 };
+
 
 #endif // WEATHERWIDGET_H
